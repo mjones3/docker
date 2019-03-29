@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+
+  userservice:
+      image: user-service:latest
+      ports:
+        - "8083:8083"
+      environment:
+        PROFILE: "default"
+        SERVER_PORT: "8083"
+        ES_PORT:           9200
+        DATABASE_PORT:     5432
+        CONFIGSERVER_PORT: 8888
+        EUREKASERVER_PORT: 8761
+        AUTHSERVER_PORT:   8091
+        CONFIGSERVER_URI: "http://configserver:8888"
+        EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+        AUTHSERVER_URI:   "http://authenticationservice:8901/auth/user"
+        ENCRYPT_KEY:       "IMSYMMETRIC"
+      # logging:
+      #   driver: splunk
+      #   options:
+      #       splunk-token: "9349116b-8b41-40cd-8c44-54854d236505"
+      #       splunk-url: "https://localhost:8088"
+      #       splunk-insecureskipverify: "true"

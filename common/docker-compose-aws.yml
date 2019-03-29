@@ -1,0 +1,171 @@
+version: '3'
+
+services:
+  
+  eurekaserver:
+    # container_name: eurekaserver
+    image:   294417223953.dkr.ecr.us-east-1.amazonaws.com/eureka-server:latest
+    ports:
+      - "8761:8761"
+    # links:
+    #   - splunk
+    # logging:
+    #   driver: awslogs
+    #   options: 
+    #     awslogs-group: tutorial-wordpress
+    #     awslogs-region: us-east-1
+    #     awslogs-stream-prefix: wordpress
+    logging:
+      driver: splunk
+      options: 
+        splunk-token: 6f6b5126-a2ee-4a79-80eb-1c3815f3311b
+        splunk-url: https://184.73.107.219:8088
+        splunk-insecureskipverify: "true"
+
+    # logging:
+    #   driver: "splunk"
+    #   options:
+    #     splunk-token: "6f6b5126-a2ee-4a79-80eb-1c3815f3311b"
+    #     splunk-url: "https://184.73.107.219:8088"
+    #     splunk-insecureskipverify: "true"
+
+         
+  # configserver:
+  #     # container_name: configserver
+  #     image: 294417223953.dkr.ecr.us-east-1.amazonaws.com/configuration-server:latest
+  #     ports:
+  #        - "8888:8888"
+  #     environment:
+  #        EUREKASERVER_PORT: 8761
+  #        EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+  #        ENCRYPT_KEY:       "IMSYMMETRIC"
+  #     links:
+  #           - eurekaserver
+  #     logging:
+  #       driver: splunk
+  #       options:
+  #           splunk-token: "f0028dc1-73d0-4d2b-8611-45185ee87611"
+  #           splunk-url: "https://localhost:8088"
+  #           splunk-insecureskipverify: "true"
+
+
+  # zuulserver:
+  #     # container_name: zuulserver
+  #     image: 294417223953.dkr.ecr.us-east-1.amazonaws.com/johncarnell/tmx-zuulsvr:chapter7
+  #     ports:
+  #       - "5555:5555"
+  #     environment:
+  #       PROFILE: "default"
+  #       SERVER_PORT: "5555"
+  #       CONFIGSERVER_PORT: 8888
+  #       EUREKASERVER_PORT: 8761
+  #       CONFIGSERVER_URI: "http://configserver:8888"
+  #       EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+  #     links:
+  #       - eurekaserver
+  #       - configserver
+  #       - splunk
+  #     logging:
+  #       driver: splunk
+  #       options:
+  #           splunk-token: "f0028dc1-73d0-4d2b-8611-45185ee87611"
+  #           splunk-url: "https://localhost:8088"
+  #           splunk-insecureskipverify: "true"
+  
+  # database:
+  #     # container_name: database
+  #     image: postgres:9.5
+  #     ports:
+  #       - "5432:5432"
+  #     environment:
+  #       - POSTGRES_USER=postgres
+  #       - POSTGRES_PASSWORD=mackdad1
+  #       - POSTGRES_DB=practicejournal
+
+  #     links:
+  #       - splunk
+  #     logging:
+  #       driver: splunk
+  #       options:
+  #           splunk-token: "f0028dc1-73d0-4d2b-8611-45185ee87611"
+  #           splunk-url: "https://localhost:8088"
+  #           splunk-insecureskipverify: "true"
+
+
+  # registrationservice:
+  #     # container_name: registrationservice
+  #     image: 294417223953.dkr.ecr.us-east-1.amazonaws.com/registration-service:latest
+  #     ports:
+  #       - "8082:8082"
+  #     environment:
+  #       PROFILE: "default"
+  #       SERVER_PORT: "8082"
+  #       ES_PORT:           9200
+  #       DATABASE_PORT:     5432
+  #       CONFIGSERVER_PORT: 8888
+  #       EUREKASERVER_PORT: 8761
+  #       AUTHSERVER_PORT:   8091
+  #       CONFIGSERVER_URI: "http://configserver:8888"
+  #       EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+  #       AUTHSERVER_URI:   "http://authenticationservice:8901/auth/user"
+  #       ENCRYPT_KEY:       "IMSYMMETRIC"
+  #     links:
+  #       - eurekaserver
+  #       - configserver
+  #       - authenticationservice
+  #       - database
+  #     logging:
+  #       driver: splunk
+  #       options:
+  #           splunk-token: "f0028dc1-73d0-4d2b-8611-45185ee87611"
+  #           splunk-url: "https://localhost:8088"
+  #           splunk-insecureskipverify: "true"
+
+  # authenticationservice:
+  #     # container_name: authenticationservice
+  #     image: 294417223953.dkr.ecr.us-east-1.amazonaws.com/authentication-service:latest
+  #     ports:
+  #       - "8901:8901"
+  #     environment:
+  #       PROFILE: "default"
+  #       SERVER_PORT: "8901"
+  #       DATABASE_PORT:     5432
+  #       CONFIGSERVER_PORT: 8888
+  #       EUREKASERVER_PORT: 8761
+  #       CONFIGSERVER_URI: "http://configserver:8888"
+  #       EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+  #       ENCRYPT_KEY:       "IMSYMMETRIC"
+  #     links:
+  #       - eurekaserver
+  #       - configserver
+  #       - database
+  #       - splunk
+  #     logging:
+  #       driver: splunk
+  #       options:
+  #         splunk-token: "58edd364-e59d-4cf0-b7f3-3aad936bf20f" 
+  #         splunk-url: "https://splunk:8088"
+  #         splunk-insecureskipverify: "true"
+
+
+  # splunk:
+  #   # container_name: splunk
+  #   image: splunk/splunk:latest
+  #   hostname: splunk
+  #   environment:
+  #     SPLUNK_START_ARGS: --accept-license --answer-yes --seed-passwd changeme
+  #     SPLUNK_ENABLE_LISTEN: 9997
+  #     SPLUNK_ADD: udp 514
+  #     SPLUNK_USER: root
+  #     SPLUNK_PASSWORD: mackdad1
+
+  #   volumes:
+  #     - /opt/splunk/etc:/opt/splunk/etc
+  #     - /opt/splunk/var:/opt/splunk/var
+  #   ports:
+  #     - "8000:8000"
+  #     - "9997:9997"
+  #     - "8088:8088"
+  #     - "514:514/udp"
+    # restart: always
+

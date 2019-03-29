@@ -1,0 +1,135 @@
+version: '3'
+
+services:
+
+  eurekaserver:
+     image: eureka-server:latest
+     ports:
+         - "8761:8761"
+     logging:
+        driver: splunk
+        options:
+            splunk-token: "f3d9e733-ec56-49d1-8625-6c7fdf410ae0"
+            splunk-url: "https://localhost:8088"
+            splunk-insecureskipverify: "true"
+
+  configserver:
+      image: configuration-server:latest
+      ports:
+         - "8888:8888"
+      environment:
+         EUREKASERVER_PORT: 8761
+         EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+         ENCRYPT_KEY:       "IMSYMMETRIC"
+      logging:
+        driver: splunk
+        options:
+            splunk-token: "90fb1c6b-a126-427f-a33f-0681bb66d1bf"
+            splunk-url: "https://localhost:8088"
+            splunk-insecureskipverify: "true"
+
+  zuulserver:
+      image: johncarnell/tmx-zuulsvr:chapter7
+      ports:
+        - "5555:5555"
+      environment:
+        PROFILE: "default"
+        SERVER_PORT: "5555"
+        CONFIGSERVER_PORT: 8888
+        EUREKASERVER_PORT: 8761
+        CONFIGSERVER_URI: "http://configserver:8888"
+        EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+      logging:
+        driver: splunk
+        options:
+            splunk-token: "9b78285e-b61e-45dc-b42f-13535d817019"
+            splunk-url: "https://localhost:8088"
+            splunk-insecureskipverify: "true"
+
+  database:
+      image: postgres:9.5
+      ports:
+        - "5432:5432"
+      environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=mackdad1
+        - POSTGRES_DB=practicejournal
+      logging:
+        driver: splunk
+        options:
+            splunk-token: "5f837289-f7e9-4b5c-9e44-a22469eb5134"
+            splunk-url: "https://localhost:8088"
+            splunk-insecureskipverify: "true"
+
+            
+  userservice:
+      image: user-service:latest
+      ports:
+        - "8083:8083"
+      environment:
+        PROFILE: "default"
+        SERVER_PORT: "8083"
+        ES_PORT:           9200
+        DATABASE_PORT:     5432
+        CONFIGSERVER_PORT: 8888
+        EUREKASERVER_PORT: 8761
+        AUTHSERVER_PORT:   8091
+        CONFIGSERVER_URI: "http://configserver:8888"
+        EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+        AUTHSERVER_URI:   "http://authenticationservice:8901/auth/user"
+        ENCRYPT_KEY:       "IMSYMMETRIC"
+      logging:
+        driver: splunk
+        options:
+            splunk-token: "9349116b-8b41-40cd-8c44-54854d236505"
+            splunk-url: "https://localhost:8088"
+            splunk-insecureskipverify: "true"
+
+  registrationservice:
+      image: registration-service:latest
+      ports:
+        - "8082:8082"
+      environment:
+        PROFILE: "default"
+        SERVER_PORT: "8082"
+        ES_PORT:           9200
+        DATABASE_PORT:     5432
+        CONFIGSERVER_PORT: 8888
+        EUREKASERVER_PORT: 8761
+        AUTHSERVER_PORT:   8091
+        CONFIGSERVER_URI: "http://configserver:8888"
+        EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+        AUTHSERVER_URI:   "http://authenticationservice:8901/auth/user"
+        ENCRYPT_KEY:       "IMSYMMETRIC"
+      logging:
+        driver: splunk
+        options:
+          splunk-token: "f588e93c-bc51-4f6c-ad46-939898299f95"
+          splunk-url: "https://localhost:8088"
+          splunk-insecureskipverify: "true"
+
+
+  
+  # authenticationservice:
+  #     image: authentication-service:latest
+  #     #image: 294417223953.dkr.ecr.us-east-1.amazonaws.com/authentication-service:latest
+  #     ports:
+  #       - "8901:8901"
+  #     environment:
+  #       PROFILE: "default"
+  #       SERVER_PORT: "8901"
+  #       DATABASE_PORT:     5432
+  #       CONFIGSERVER_PORT: 8888
+  #       EUREKASERVER_PORT: 8761
+  #       CONFIGSERVER_URI: "http://configserver:8888"
+  #       EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+  #       ENCRYPT_KEY:       "IMSYMMETRIC"
+  #     logging:
+  #       driver: splunk
+  #       options:
+  #         splunk-token: "2dcce2b8-e2c3-41f7-b88e-5bee5ea12d5e" 
+  #         splunk-url: "https://localhost:8088"
+  #         splunk-insecureskipverify: "true"
+
+
+
